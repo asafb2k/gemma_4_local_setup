@@ -35,12 +35,26 @@ This file records architecture decisions in an ADR-style format.
 - **Rationale**: Most reliable support path for NVIDIA containers on Windows hosts.
 - **Alternatives considered**: Native Windows runtime.
 
-## 2026-04-03 - Bridge Claude Code through LiteLLM
+## 2026-04-03 - Bridge Claude Code through LiteLLM (superseded)
 
 - **Context**: Claude Code expects Anthropic-compatible endpoints.
 - **Decision**: Add LiteLLM proxy mapping Claude model names to local Gemma via Ollama API.
 - **Rationale**: Avoid custom protocol adapter code and keep a standard local bridge.
 - **Alternatives considered**: Custom translation service.
+- **Status**: **Superseded** -- see direct Ollama entry below.
+
+## 2026-04-03 - Connect Claude Code directly to Ollama
+
+- **Context**: LiteLLM's Anthropic-to-OpenAI translation layer drops `tool_use` blocks, so Claude Code cannot execute tools (Bash, Read, Write, etc.) through the proxy. Ollama v0.14+ added native Anthropic API compatibility at `/v1/messages`, including structured `tool_use` responses, streaming, and vision.
+- **Decision**: Point Claude Code directly at Ollama (`http://localhost:11434`) using the native Anthropic API. Use `claude-launcher` to remap all role models to the local Ollama model.
+- **Rationale**:
+  - Eliminates the LiteLLM translation layer and its tool-call parsing bugs.
+  - Ollama v0.20.0 fully supports `tool_use` content blocks in Anthropic format.
+  - `claude-launcher` prevents background role-model requests from leaking to Anthropic cloud.
+- **Alternatives considered**:
+  - LiteLLM with `ollama_chat/` prefix and `supports_function_calling`: partial fix, still has known parsing issues ([litellm#24091](https://github.com/BerriAI/litellm/issues/24091)).
+  - Custom middleware to transform tool responses: unnecessary given Ollama's native support.
+- **LiteLLM retained as optional**: Still useful for OpenAI-compatible clients that are not Claude Code.
 
 ## 2026-04-03 - Default model target
 

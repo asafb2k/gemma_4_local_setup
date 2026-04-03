@@ -4,9 +4,10 @@ Local-first Gemma 4 stack on Windows + WSL2 + Docker, using Ollama as the infere
 
 ## What this repository provides
 
-- Ollama serving Gemma 4 models on `http://localhost:11434`
+- Ollama serving Gemma 4 models on `http://localhost:11434` (with native Anthropic API compatibility)
 - Open-WebUI at `http://localhost:3000`
-- LiteLLM proxy on `http://localhost:4000` to bridge Claude Code (Anthropic API) to local Ollama backend
+- Claude Code connected directly to Ollama with full tool support (Bash, Read, Write, Glob, Grep, etc.)
+- LiteLLM proxy on `http://localhost:4000` (optional, for OpenAI-compatible clients)
 - Python terminal chat client at `cli/chat.py`
 - PowerShell scripts to start, switch, and orchestrate the stack
 
@@ -20,13 +21,13 @@ flowchart LR
     end
     subgraph host [Windows Host]
         CLI["cli/chat.py"]
-        LLM["LiteLLM :4000"]
+        LLM["LiteLLM :4000 (optional)"]
         CC["Claude Code"]
     end
     WEBUI --> OLLAMA
     CLI --> OLLAMA
     LLM --> OLLAMA
-    CC --> LLM
+    CC -->|"Anthropic API /v1/messages"| OLLAMA
 ```
 
 ## Prerequisites
@@ -140,33 +141,61 @@ Slash commands:
 - `/model <name>`
 - `/system <prompt>`
 
-## Claude Code via LiteLLM
+## Claude Code (direct Ollama connection)
 
-1. Start LiteLLM:
+Ollama v0.14+ supports the Anthropic Messages API natively, so Claude Code connects
+directly to Ollama with full tool support (Bash, Read, Write, Glob, Grep, etc.) — no
+translation layer needed.
+
+```powershell
+.\scripts\start_claude_code.ps1
+```
+
+Or with a different model variant:
+
+```powershell
+.\scripts\start_claude_code.ps1 -Model gemma4:31b
+```
+
+This sets:
+
+- `ANTHROPIC_BASE_URL=http://localhost:11434`
+- `ANTHROPIC_AUTH_TOKEN=ollama`
+- `ANTHROPIC_API_KEY=""` (prevents calls to Anthropic cloud)
+
+### With claude-launcher (recommended for full role remapping)
+
+Claude Code routes tasks to different role models (Haiku/Sonnet/Opus).
+`claude-launcher` remaps all roles to your chosen Ollama model so every request stays local:
+
+```powershell
+npm install -g claude-launcher   # one-time install
+.\scripts\start_claude_launcher.ps1
+```
+
+Or with a specific model:
+
+```powershell
+.\scripts\start_claude_launcher.ps1 -Model gemma4:31b
+```
+
+## LiteLLM proxy (optional)
+
+LiteLLM is still available for OpenAI-compatible clients that need an Anthropic-style
+endpoint. It is no longer required for Claude Code.
 
 ```powershell
 conda activate gemma_4_env
 .\scripts\start_litellm.ps1
 ```
 
-2. In another shell, start Claude Code with local endpoint:
-
-```powershell
-.\scripts\start_claude_code.ps1
-```
-
-This sets:
-
-- `ANTHROPIC_BASE_URL=http://localhost:4000`
-- `ANTHROPIC_AUTH_TOKEN=sk-local-key`
-
 ## Verification checklist
 
 1. `Invoke-RestMethod http://localhost:11434/api/tags` returns model list.
 2. Open-WebUI loads and can complete a prompt.
 3. `python .\cli\chat.py` streams responses.
-4. LiteLLM is reachable at `http://localhost:4000`.
-5. Claude Code can run prompts through LiteLLM.
+4. Claude Code can execute tools (Bash, Read, Write) through Ollama.
+5. (Optional) LiteLLM is reachable at `http://localhost:4000`.
 
 ## Troubleshooting
 

@@ -26,18 +26,34 @@ Track setup and runtime problems here as you encounter them.
     - Confirm GPU is used: `docker exec gemma_4_local_setup-ollama-1 ollama ps`
     - Ensure Docker Compose has GPU reservation (check `docker-compose.yml`).
 
-## LiteLLM / Claude Code
+## Claude Code
 
 - **Symptom**: Claude Code auth or model errors.
   - **Checks**:
-    - `ANTHROPIC_BASE_URL=http://localhost:4000`
-    - `ANTHROPIC_AUTH_TOKEN=sk-local-key`
-    - LiteLLM running with `configs/litellm_config.yaml`.
+    - `ANTHROPIC_BASE_URL=http://localhost:11434` (direct Ollama, not LiteLLM)
+    - `ANTHROPIC_AUTH_TOKEN=ollama`
+    - `ANTHROPIC_API_KEY=""` (empty to prevent cloud calls)
+    - Ollama container is running and model is pulled.
+
+- **Symptom**: Claude Code outputs tool call JSON as plain text instead of executing tools.
+  - **Cause**: Likely routed through LiteLLM instead of directly to Ollama.
+  - **Fix**: Use `scripts/start_claude_code.ps1` which points at Ollama's native Anthropic API.
+
+- **Symptom**: Some Claude Code requests fail or leak to Anthropic cloud.
+  - **Cause**: Claude Code routes tasks to different role models (Haiku/Sonnet/Opus).
+  - **Fix**: Use `scripts/start_claude_launcher.ps1` which remaps all roles to your local model.
+
+- **Symptom**: Model struggles with Claude Code's tool definitions.
+  - **Cause**: Claude Code sends ~259 tool definitions; small models (<8B params) can choke.
+  - **Fix**: Use `gemma4:26b` or `gemma4:31b` which have enough capacity.
+
+## LiteLLM (optional)
 
 - **Symptom**: LiteLLM starts but upstream calls fail.
   - **Checks**:
     - `api_base` points to `http://localhost:11434`
     - Model is pulled and available in Ollama.
+    - Config uses `ollama_chat/` prefix (not `ollama/`).
 
 ## Open-WebUI
 

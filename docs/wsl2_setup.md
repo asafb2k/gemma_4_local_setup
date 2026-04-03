@@ -1,6 +1,6 @@
 # WSL2 + Docker + GPU Setup
 
-This project runs TensorRT-LLM in Docker with WSL2 backend.
+This project runs Ollama in Docker with WSL2 backend.
 
 ## 1) Install and update WSL2
 
@@ -43,11 +43,11 @@ Expected result: NVIDIA device (RTX 4090) appears inside container.
 From project root:
 
 ```powershell
-docker compose up -d trtllm
+docker compose up -d ollama
 ```
 
-When ready, this should return model metadata:
+When ready, this should return a version response:
 
 ```powershell
-Invoke-RestMethod http://localhost:8000/v1/models
+Invoke-RestMethod http://localhost:11434/api/version
 ```

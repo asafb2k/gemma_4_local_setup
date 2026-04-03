@@ -12,12 +12,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Local Gemma chat client")
     parser.add_argument(
         "--model",
-        default="google/gemma-4-26B-A4B-it",
+        default="gemma4:26b",
         help="Model name exposed by the OpenAI-compatible server.",
     )
     parser.add_argument(
         "--base-url",
-        default="http://localhost:8000/v1",
+        default="http://localhost:11434/v1",
         help="OpenAI-compatible API base URL.",
     )
     parser.add_argument(

@@ -1,5 +1,5 @@
 param(
-    [string]$Model = "google/gemma-4-26B-A4B-it"
+    [string]$Model = "gemma4:26b"
 )
 
 Set-StrictMode -Version Latest
@@ -7,8 +7,8 @@ $ErrorActionPreference = "Stop"
 
 $scriptsDir = $PSScriptRoot
 
-Write-Host "Step 1/3: starting TensorRT-LLM..."
-& (Join-Path $scriptsDir "start_trtllm.ps1") -Model $Model
+Write-Host "Step 1/3: starting Ollama and pulling model..."
+& (Join-Path $scriptsDir "start_ollama.ps1") -Model $Model
 
 Write-Host "Step 2/3: starting Open-WebUI..."
 & (Join-Path $scriptsDir "start_webui.ps1")

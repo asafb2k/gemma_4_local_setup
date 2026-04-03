@@ -1,21 +1,15 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet("google/gemma-4-31B-it", "google/gemma-4-26B-A4B-it", "google/gemma-4-E4B-it")]
+    [ValidateSet("gemma4:31b", "gemma4:26b", "gemma4:e4b", "gemma4:e2b")]
     [string]$Model
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-Write-Host "Switching TensorRT-LLM model to $Model"
+Write-Host "Pulling $Model in Ollama..."
+docker exec gemma_4_local_setup-ollama-1 ollama pull $Model
 
-$envPath = Join-Path $PSScriptRoot "..\.env"
-"MODEL_ID=$Model" | Set-Content -Path $envPath -Encoding ASCII
-Write-Host "Wrote $envPath"
-
-docker compose --env-file $envPath up -d trtllm
-
-Write-Host "Restart complete. Validating model endpoint..."
-Start-Sleep -Seconds 5
-Invoke-RestMethod -Uri "http://localhost:8000/v1/models" -Method Get | Out-Null
-Write-Host "Model switch request applied."
+Write-Host "Model $Model is now available."
+Write-Host "Use it in CLI:  python .\cli\chat.py --model $Model"
+Write-Host "Or in Open-WebUI select $Model from the model dropdown."

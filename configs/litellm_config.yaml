@@ -1,4 +1,10 @@
 model_list:
+  - model_name: "claude-sonnet-4-6"
+    litellm_params:
+      model: "ollama/gemma4:26b"
+      api_base: "http://localhost:11434"
+      api_key: "not-needed"
+
   - model_name: "claude-sonnet-4-20250514"
     litellm_params:
       model: "ollama/gemma4:26b"
@@ -6,6 +12,12 @@ model_list:
       api_key: "not-needed"
 
   - model_name: "claude-haiku-4-20250414"
+    litellm_params:
+      model: "ollama/gemma4:26b"
+      api_base: "http://localhost:11434"
+      api_key: "not-needed"
+
+  - model_name: "claude-opus-4-5"
     litellm_params:
       model: "ollama/gemma4:26b"
       api_base: "http://localhost:11434"

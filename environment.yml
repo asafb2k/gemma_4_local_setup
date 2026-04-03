@@ -9,5 +9,5 @@ dependencies:
       - openai
       - requests
       - rich
-      - "litellm[proxy]"
+      - litellm
       - open-webui

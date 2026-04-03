@@ -1,0 +1,34 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Secrets and local env
+.env
+.env.*
+!.env.example
+
+# Local model and engine artifacts
+models/
+engines/
+.cache/
+hf-cache/
+
+# Docker and service data
+open-webui-data/
+volumes/
+
+# Conda / Python envs
+.venv/
+venv/
+env/
+.conda/
+conda-meta/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

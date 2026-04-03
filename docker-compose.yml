@@ -1,0 +1,43 @@
+services:
+  trtllm:
+    image: nvcr.io/nvidia/tensorrt-llm/release:1.3.0rc10
+    ports:
+      - "8000:8000"
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      MODEL_ID: ${MODEL_ID:-google/gemma-4-26B-A4B-it}
+    command: >
+      trtllm-serve ${MODEL_ID:-google/gemma-4-26B-A4B-it}
+      --host 0.0.0.0
+      --port 8000
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    environment:
+      OPENAI_API_BASE_URL: http://trtllm:8000/v1
+      OPENAI_API_KEY: not-needed
+    volumes:
+      - open-webui-data:/app/backend/data
+    depends_on:
+      - trtllm
+    restart: always
+
+volumes:
+  hf-cache:
+  open-webui-data:

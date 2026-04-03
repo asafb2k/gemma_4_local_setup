@@ -1,0 +1,13 @@
+name: gemma_4_env
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - openai
+      - requests
+      - rich
+      - "litellm[proxy]"
+      - open-webui

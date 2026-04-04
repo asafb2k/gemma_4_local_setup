@@ -155,9 +155,7 @@ Or pass a model directly to skip the menu:
 
 Claude Code will open in your terminal with full tool support (Bash, Read, Write, Glob, Grep, etc.) backed by your local Gemma 4 model.
 
-> `start_claude_launcher.ps1` uses `claude-launcher` which remaps all role models to your
-> chosen local model. If you prefer the plain `claude` binary, use `start_claude_code.ps1`
-> instead — same flags, same behavior, without role remapping.
+Both `start_claude_code.ps1` and `start_claude_launcher.ps1` do the same thing and can be used interchangeably.
 
 ---
 
